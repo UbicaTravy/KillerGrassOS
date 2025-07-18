@@ -1,11 +1,10 @@
-print_string:
+print:
     lodsb
-    or al, al
+    test al, al
     jz .done
     mov ah, 0x0E
-    mov bx, 0x0007
     int 0x10
-    jmp print_string
+    jmp print
 .done:
     ret
 
@@ -36,6 +35,7 @@ read_string:
     jz .loop
     dec di
     dec cx
+    
     mov ah, 0x0E
     mov al, 0x08
     int 0x10
