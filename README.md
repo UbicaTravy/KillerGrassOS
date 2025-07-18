@@ -117,6 +117,10 @@ time     commands/time.asm    Current time (via CMOS)
 reboot   commands/reboot.asm  Reboot(trigger 0xFE to port 0x64)
 ```
 
+# Now, you can seen
+
+<img src="img/screenshot_v0.0001.jpg" width="700" alt="FecalOS_meme"/>
+
 # License
 
 [![License](https://img.shields.io/badge/License-GNU_GPL_v3.0-green)](LICENSE)
