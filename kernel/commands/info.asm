@@ -102,12 +102,22 @@ info_print_char:
 
 ; Данные команды
 info_command db "info", 0
-info_info_msg db "=== System Information ===", 0x0D, 0x0A, 0
-info_cpu_msg db "CPU: ", 0
-info_cpu_8086_str db "8086/8088", 0x0D, 0x0A, 0
-info_cpu_286_str db "80286 or higher", 0x0D, 0x0A, 0
-info_mem_msg db "Base memory: ", 0
-info_kb_msg db " KB", 0x0D, 0x0A, 0
-info_time_msg db "Current time: ", 0
-info_time_error_msg db "Error reading time", 0x0D, 0x0A, 0
+info_info_msg:
+    db " ___________________________ ", 0x0D, 0x0A
+    db "|=== System Information ===|", 0x0D, 0x0A
+    db "|--------------------------|", 0x0D, 0x0A
+    db "| OS Version:     v0.0001  |", 0x0D, 0x0A
+    db "|                          |", 0x0D, 0x0A, 0
+
+info_cpu_msg db "| CPU: ", 0
+info_cpu_8086_str db "8086/8088          |", 0x0D, 0x0A, 0
+info_cpu_286_str db "80286 or higher     |", 0x0D, 0x0A, 0
+
+info_mem_msg db "| Base memory: ", 0
+info_kb_msg db " KB      |", 0x0D, 0x0A, 0
+
+info_time_msg db "| Current time: ", 0
+info_time_value db "HH:MM:SS         |", 0x0D, 0x0A  ; Шаблон для вывода времени
+info_time_error_msg db "Error            |", 0x0D, 0x0A
+    db "|__________________________|", 0x0D, 0x0A, 0
 info_crlf db 0x0D, 0x0A, 0
