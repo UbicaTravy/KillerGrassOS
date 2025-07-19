@@ -25,6 +25,8 @@ start:
 %include "../lib/io.asm"
 %include "../lib/string.asm"
 
+%include "programs/kg.asm"
+
 ; Подключаем команды
 %include "commands/help.asm"
 %include "commands/clear.asm"
@@ -33,6 +35,8 @@ start:
 %include "commands/mem.asm"
 %include "commands/time.asm"
 %include "commands/reboot.asm"
+%include "commands/kg.asm"
+%include "commands/nirvana.asm"
 
 main_loop:
     ; Проверка целостности стека
@@ -66,6 +70,8 @@ handle_command:
     call check_info
     call check_mem
     call check_time
+    call check_nirvana
+    call check_kg
     call check_reboot
     
     ; Если команда не распознана
