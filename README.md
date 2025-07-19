@@ -35,7 +35,7 @@ FecalOS/
 │   ├──programs/
 │   | └──kg.asm         # Program KillerGrass Text Editor 
 │   └── commands/       # System commands
-│       ├── help.asm    # Help
+│       ├── help.asm    # Show all commands
 │       ├── clear.asm   # Clear screen
 │       ├── exit.asm    # Shutdown
 │       ├── info.asm    # Info about system
