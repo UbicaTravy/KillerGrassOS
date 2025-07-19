@@ -29,9 +29,11 @@ FecalOS is a minimal 16-bit x86 operating system designed for entertainment and 
 ## Project structure
 ```
 FecalOS/
-├── boot.asm            # Booter (512 байт)
+├── boot.asm            # Booter (512 bait)
 ├── kernel/
 │   ├── main.asm        # Kernel OS
+│   ├──programs/
+│   | └──kg.asm         # Program KillerGrass Text Editor 
 │   └── commands/       # System commands
 │       ├── help.asm    # Help
 │       ├── clear.asm   # Clear screen
@@ -39,11 +41,13 @@ FecalOS/
 │       ├── info.asm    # Info about system
 │       ├── mem.asm     # Info about memory
 │       ├── time.asm    # Show time
+│       ├── kg.asm      # KillerGrass Editor Command
 │       └── reboot.asm  # Reboot
 ├── lib/
 │   ├── io.asm          # Input/Output
 │   └── string.asm      # String operation
-└── build.bat           # Build and run OS
+├── run.bat             # Run OS
+└── build.bat           # Build OS
 ```
 
 ## Basic technologies:
@@ -113,6 +117,7 @@ clear    commands/clear.asm   Clear screen
 exit     commands/exit.asm    Shutdown (via ACPI/hang)
 info     commands/info.asm    CPU and memory information
 mem      commands/mem.asm     Base memory size (int 0x12)
+kg -     commans/kg.asm       Open Text Editor KillerGrass
 time     commands/time.asm    Current time (via CMOS)
 reboot   commands/reboot.asm  Reboot(trigger 0xFE to port 0x64)
 ```
@@ -120,6 +125,15 @@ reboot   commands/reboot.asm  Reboot(trigger 0xFE to port 0x64)
 # Now, you can seen
 
 <img src="img/screenshot_v0.0001.jpg" width="700" alt="FecalOS_meme"/>
+
+# I was inspired by:
+
+[Little book about creating OS](https://littleosbook.github.io/#host-operating-system)
+
+[Temple OS](https://templeos.org/)
+[What it is?](https://en.wikipedia.org/wiki/TempleOS)
+
+[bootOS](https://github.com/nanochess/bootOS)
 
 # License
 
