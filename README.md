@@ -1,162 +1,135 @@
-# Fecal OS
+# FecalOS
+
+> **FecalOS** is a simple 32-bit operating system with a modular kernel, GRUB/Multiboot support, VGA driver, basic command shell, and demo user code. See below for Russian description and details.
+
+---
 
 ![ASM](https://img.shields.io/badge/Assembler-16_bit-007AAC?style=flat&logo=assemblyscript&logoColor=white)
 ![NASM](https://img.shields.io/badge/Assembler-NASM-007AAC?style=flat&logo=assemblyscript&logoColor=white)
 [![QEMU x86](https://img.shields.io/badge/QEMU-x86-FF6600?style=flat)]()
 
-This is the English README
-
-[![Русский](https://img.shields.io/badge/README-Русский-blue)](README_ru.md)
-
-
 <div align="center">
 <img src="img/Fecal_OS_logo.png" width="500" alt="FecalOS_logo"/>
 </div>
 
-# Simple OS on Assembler
+**FecalOS** — простая 32-битная операционная система с модульным ядром, поддержкой GRUB/Multiboot, VGA-драйвером, базовой командной оболочкой и демонстрационным пользовательским кодом.
 
-FecalOS is a minimal 16-bit x86 operating system designed for entertainment and educational purposes. It runs in real mode and includes its own bootloader, kernel, and basic system commands. The project demonstrates low-level programming using BIOS interrupts for I/O, disk operations, and memory management.
+Последняя версия: v0.0002
 
-<div align="center">
+---
 
-## Current OS version: v0.0001
-</div>
+## Быстрый старт
 
-<div align="center">
-<img src="img/FecalOS_is_not UNIX.png" width="700" alt="FecalOS_meme"/>
-</div>
+### Сборка и запуск в QEMU
 
-## Project structure
+```bash
+sudo apt install gcc nasm binutils grub-pc-bin xorriso qemu-system-x86
+make clean && make iso
+qemu-system-x86_64 -cdrom fecalos.iso -serial stdio -no-reboot -no-shutdown
+```
+
+---
+
+## 📁 Структура проекта
+
 ```
 FecalOS/
-├── boot.asm            # Booter (512 bait)
-├── kernel/
-│   ├── main.asm        # Kernel OS
-│   ├──programs/
-│   | └──kg.asm         # Program KillerGrass Text Editor 
-│   └── commands/       # System commands
-│       ├── help.asm    # Show all commands
-│       ├── clear.asm   # Clear screen
-│       ├── exit.asm    # Shutdown
-│       ├── info.asm    # Info about system
-│       ├── mem.asm     # Info about memory
-│       ├── time.asm    # Show time
-│       ├── kg.asm      # KillerGrass Editor Command
-│       └── reboot.asm  # Reboot
-├── lib/
-│   ├── io.asm          # Input/Output
-│   └── string.asm      # String operation
-├── run.bat             # Run OS
-└── build.bat           # Build OS
+├── drivers/           # Драйверы устройств (VGA, клавиатура)
+│   ├── vga.c/h
+│   ├── keyboard.c/h
+├── kernel.c           # Ядро: инициализация, проверки, запуск fecalos_main
+├── fecalos.c          # Пользовательская/демонстрационная логика ОС
+├── fecalos.h          # Прототип fecalos_main
+├── string.c/h         # Строковые функции
+├── types.h            # Собственные типы (size_t, uint32_t и др.)
+├── boot.asm           # Загрузчик
+├── multiboot_header.asm # Multiboot2 заголовок
+├── linker.ld          # Скрипт линковки
+└── Makefile           # Система сборки
 ```
 
-## Basic technologies:
+## Сборка
 
-- BIOS interrupts for I/O
-- Real Mode (16-bit x86 mode)
-- MBR boot (without GRUB)
-- VGA text mode (80x25)
+### Требования
 
-## Bootloader (512 bytes)
+- gcc (32-битная поддержка)
+- nasm
+- ld, objcopy (binutils)
+- grub-mkrescue, xorriso (для ISO)
+- qemu-system-x86 (для теста)
 
-- Standalone MBR bootloader (512 bytes)
-- Loading kernel from disk at address 0x8000
-- Checking for disk read errors
-- Transition to protected mode (not implemented yet, but there is a template)
+### Основные команды
 
-## Base kernel (kernel/main.asm):
-
-- Initialization of segment registers
-- Command management via a single handler
-- System input buffer (64 bytes)
-- Mechanism for handling unknown commands
-
-## Drivers and libraries
-
-- VGA driver (via BIOS int 0x10):
-- Text output (80x25 mode)
-- Screen clearing (clear command)
-- Backspace support when input
-
-## Keyboard input (via BIOS int 0x16):
-
-- Reading scan codes
-- Enter/Backspace processing
-- Input buffering
-
-## String functions (lib/string.asm):
-
-- strcmp - string comparison
-- Converting numbers to strings (for mem)
-
-## Critical components:
-
-```asm
-int 0x10 # BIOS Video Service
-int 0x16 # Keyboard Input
-int 0x13 # Disk Operations
-int 0x15 # Advanced Services
-int 0x1A # Real Time Clock
+```bash
+make clean         # Очистить сборку
+make               # Собрать образ os.img (флоппи)
+make iso           # Собрать загрузочный ISO-образ
+make run           # Запустить os.img в QEMU
 ```
 
-## Project memory:
+---
 
-```
-Address       Purpose Size
-0x7C00-0x7DFF Bootloader (MBR) 512 bytes
-0x8000-0x8FFF OS kernel 4KB
-0x9000-0x9FFF Command buffer 4KB
-0xA000-0xFFFF Stack and temporary data 24KB
-```
+## Запуск
 
-## System commands
-```
-Command  File                 Functionality
-help     commands/help.asm    List of commands
-clear    commands/clear.asm   Clear screen
-exit     commands/exit.asm    Shutdown (via ACPI/hang)
-info     commands/info.asm    CPU and memory information
-mem      commands/mem.asm     Base memory size (int 0x12)
-kg -     commans/kg.asm       Open Text Editor KillerGrass
-time     commands/time.asm    Current time (via CMOS)
-reboot   commands/reboot.asm  Reboot(trigger 0xFE to port 0x64)
-```
+- **ISO (рекомендуется):**
+  ```bash
+  qemu-system-x86_64 -cdrom fecalos.iso -serial stdio -no-reboot -no-shutdown
+  ```
+- **Флоппи-образ:**
+  ```bash
+  make run
+  ```
 
-# Now, you can seen
+---
 
-<img src="img/screenshot_v0.0001.jpg" width="700" alt="FecalOS_meme"/>
+## Архитектура
 
-# I was inspired by:
+- **kernel.c** — инициализация драйверов, проверки, запуск fecalos_main
+- **fecalos.c** — пользовательская логика, приветствие, демонстрация возможностей
+- **drivers/** — VGA, клавиатура (PS/2)
+- **commands/** — help, info, clear, echo, version
+- **shell.c/h** — простая командная строка
+- **types.h** — собственные типы для freestanding-сборки
 
-[Little book about creating OS](https://littleosbook.github.io/#host-operating-system)
+---
 
-[Temple OS](https://templeos.org/)
-[What it is?](https://en.wikipedia.org/wiki/TempleOS)
+## Возможности
 
-[bootOS](https://github.com/nanochess/bootOS)
+- VGA текстовый режим (16 цветов, индивидуальный фон для каждой строки)
+- PS/2 клавиатура (обработка ввода)
+- Командная строка (CLI)
+- Базовые команды (help, info, clear, echo, version)
+- Модульная архитектура (ядро ≠ пользовательская логика)
+- Сборка ISO и запуск в QEMU
 
-# License
+---
+
+## Contributing
+
+Pull requests, issues, and suggestions are welcome! Feel free to fork the project and make it better. See the code comments for style and humor guidelines :)
+
+---
+
+## License
 
 [![License](https://img.shields.io/badge/License-GNU_GPL_v3.0-green)](LICENSE)
+
+---
 
 ### Created by KillerGrass
 
 <div align="center">
-
 <img src="img/killergrass_logo.jpg" width="400" alt="KillerGrass_logo"/>
 
 [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/UbicaTravy)
-
 [![Telegram](https://img.shields.io/badge/-Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/killergrass_programms)
-
-[![LIVE Channel](https://img.shields.io/badge/-LIVE&nbsp;Kanal-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/kanal_kashkamalhika)
-
+[![LIVE Channel](https://img.shields.io/badge/-LIVE%20Kanal-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/kanal_kashkamalhika)
 </div>
 
 <div align="center">
 
 ## Contacts
 
-[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat&logo=telegram&logoColor=white)](https://t.me/killer_grass1834)
+[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat&logo=telegram&logoColor=white)](https://t.me/KillerGrassContactBot)
 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat&logo=gmail&logoColor=white)](mailto:killergrasscontact@gmail.com)
 </div>
