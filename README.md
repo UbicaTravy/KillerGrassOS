@@ -26,8 +26,8 @@
 
 ```bash
 sudo apt install gcc nasm binutils grub-pc-bin xorriso qemu-system-x86
-make clean && make iso
-qemu-system-x86_64 -cdrom fecalos.iso -serial stdio -no-reboot -no-shutdown
+make clean && make
+qemu-system-x86_64 -drive format=raw,file=os.img -serial stdio -no-reboot -no-shutdown
 ```
 
 ---
@@ -65,7 +65,7 @@ FecalOS/
 ```bash
 make clean         # Очистить сборку
 make               # Собрать образ os.img (флоппи)
-make iso           # Собрать загрузочный ISO-образ
+make iso           # Собрать загрузочный ISO-образ (не работает)
 make run           # Запустить os.img в QEMU
 ```
 
@@ -73,7 +73,7 @@ make run           # Запустить os.img в QEMU
 
 ## Запуск
 
-- **ISO (рекомендуется):**
+- **ISO (не работает):**
   ```bash
   qemu-system-x86_64 -cdrom fecalos.iso -serial stdio -no-reboot -no-shutdown
   ```
