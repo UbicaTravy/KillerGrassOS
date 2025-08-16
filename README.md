@@ -1,6 +1,6 @@
 # KillerGrass OS (KGOS)
 
-> **KillerGrass OS (KGOS)** is a simple 32-bit operating system with a modular kernel, GRUB/Multiboot support, VGA driver, basic command shell, and demo user code. See below for Russian description and details.
+> **KillerGrass OS (KGOS)** is a simple 32-bit operating system with a modular kernel, VGA driver, basic command shell, and demo user code. See below for Russian description and details.
 
 ---
 
