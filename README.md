@@ -1,6 +1,6 @@
-# FecalOS
+# KillerGrass OS (KGOS)
 
-> **FecalOS** is a simple 32-bit operating system with a modular kernel, GRUB/Multiboot support, VGA driver, basic command shell, and demo user code. See below for Russian description and details.
+> **KillerGrass OS (KGOS)** is a simple 32-bit operating system with a modular kernel, GRUB/Multiboot support, VGA driver, basic command shell, and demo user code. See below for Russian description and details.
 
 ---
 
@@ -9,10 +9,14 @@
 [![QEMU x86](https://img.shields.io/badge/QEMU-x86-FF6600?style=flat)]()
 
 <div align="center">
-<img src="img/Fecal_OS_logo.png" width="500" alt="FecalOS_logo"/>
+<img src="img/killergrass_os_logo.png" width="500" alt="KillerGrassOS_logo"/>
 </div>
 
-**FecalOS** — простая 32-битная операционная система с модульным ядром, поддержкой GRUB/Multiboot, VGA-драйвером, базовой командной оболочкой и демонстрационным пользовательским кодом.
+**KillerGrass OS (KGOS)** — простая 32-битная операционная система с модульным ядром, VGA-драйвером, базовой командной оболочкой и демонстрационным пользовательским кодом.
+
+**!Внимание!**
+
+Ранее проект назывался FecalOS - в коде оно встречается. Сочтите за пасхалку)
 
 Последняя версия: v0.0002
 
@@ -35,7 +39,7 @@ qemu-system-x86_64 -drive format=raw,file=os.img -serial stdio -no-reboot -no-sh
 ## 📁 Структура проекта
 
 ```
-FecalOS/
+KGOS/
 ├── drivers/           # Драйверы устройств (VGA, клавиатура)
 │   ├── vga.c/h
 │   ├── keyboard.c/h
@@ -65,7 +69,6 @@ FecalOS/
 ```bash
 make clean         # Очистить сборку
 make               # Собрать образ os.img (флоппи)
-make iso           # Собрать загрузочный ISO-образ (не работает)
 make run           # Запустить os.img в QEMU
 ```
 
@@ -73,10 +76,6 @@ make run           # Запустить os.img в QEMU
 
 ## Запуск
 
-- **ISO (не работает):**
-  ```bash
-  qemu-system-x86_64 -cdrom fecalos.iso -serial stdio -no-reboot -no-shutdown
-  ```
 - **Флоппи-образ:**
   ```bash
   make run
