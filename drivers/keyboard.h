@@ -11,7 +11,7 @@
 // - Функции для работы с буфером
 // - Функции для работы с модификаторами
 
-// FecalOS Keyboard Driver
+// KillerGrass OS (KGOS) Keyboard Driver
 // Author: KillerGrass
 
 #ifndef KEYBOARD_H
@@ -45,6 +45,13 @@
 #define KEY_F10          0x44
 #define KEY_F11          0x57
 #define KEY_F12          0x58
+#define KEY_X            0x2D
+
+// стрелочные клавиши (используются после префикса 0xE0)
+#define KEY_UP           0x48
+#define KEY_LEFT         0x4B
+#define KEY_RIGHT        0x4D
+#define KEY_DOWN         0x50
 
 // специальные коды
 #define KEY_RELEASE      0x80
@@ -66,22 +73,25 @@ typedef struct {
 } keyboard_state_t;
 
 // функции драйвера
-void keyboard_init(void); // инициализирует клавиатуру
-unsigned char keyboard_read_scancode(void); // читает скан-код клавиши
-char keyboard_scancode_to_ascii(unsigned char scancode); // преобразует скан-код в ASCII
-char keyboard_get_char(void); // получает символ из буфера
-int keyboard_has_data(void); // проверяет, есть ли данные в буфере
-void keyboard_handle_input(void); // обрабатывает ввод
+void keyboard_init(void);
+unsigned char keyboard_read_scancode(void);
+char keyboard_scancode_to_ascii(unsigned char scancode);
+char keyboard_get_char(void);
+int keyboard_has_data(void);
+void keyboard_handle_input(void);
 
 // функции для работы с буфером
-void keyboard_buffer_put(unsigned char c); // добавляет символ в буфер
-unsigned char keyboard_buffer_get(void); // извлекает символ из буфера
-int keyboard_buffer_empty(void); // проверяет, пуст ли буфер
+void keyboard_buffer_put(unsigned char c);
+unsigned char keyboard_buffer_get(void);
+int keyboard_buffer_empty(void);
 
 // функции для работы с модификаторами
-unsigned char keyboard_is_shift_pressed(void); // проверяет, нажата ли клавиша Shift
-unsigned char keyboard_is_ctrl_pressed(void); // проверяет, нажата ли клавиша Ctrl
-unsigned char keyboard_is_alt_pressed(void); // проверяет, нажата ли клавиша Alt
-unsigned char keyboard_is_caps_lock(void); // проверяет, нажата ли клавиша Caps Lock
+unsigned char keyboard_is_shift_pressed(void);
+unsigned char keyboard_is_ctrl_pressed(void);
+unsigned char keyboard_is_alt_pressed(void);
+unsigned char keyboard_is_caps_lock(void);
+
+// Глобальное состояние клавиатуры
+extern keyboard_state_t keyboard_state;
 
 #endif

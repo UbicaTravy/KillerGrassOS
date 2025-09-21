@@ -18,11 +18,14 @@
 // - vga_scroll_up - скроллинг экрана
 // - vga_set_cursor - установка курсора
 
-// FecalOS VGA Driver
+// KillerGrass OS (KGOS) VGA Driver
 // Author: KillerGrass
 
+// vga.h
 #ifndef VGA_H
 #define VGA_H
+
+#include "../libs/types.h"
 
 // цвета VGA
 #define VGA_BLACK         0x00
@@ -40,31 +43,39 @@
 #define VGA_LIGHT_RED     0x0C
 #define VGA_LIGHT_MAGENTA 0x0D
 #define VGA_LIGHT_BROWN   0x0E
-#define VGA_LIGHT_YELLOW  0x0E  // тот же цвет, что и LIGHT_BROWN
+#define VGA_LIGHT_YELLOW  0x0E
 #define VGA_WHITE         0x0F
 
-// константы VGA
+// константы VGA для стандартного текстового режима 80x25
 #define VGA_WIDTH  80
 #define VGA_HEIGHT 25
 #define VGA_BUFFER 0xB8000
 
-// специальные значения для цвета фона
-#define VGA_USE_GLOBAL_BG 0xFF  // использовать глобальный цвет фона
+// специальные значения
+#define VGA_USE_GLOBAL_BG 0xFF
 
-// функции драйвера VGA
-void vga_init(void); // инициализация VGA драйвера
-void vga_clear_screen(void); // очистка экрана
-void vga_set_color(unsigned char color); // установка цвета
-unsigned char vga_get_color(void); // получение текущего цвета
-void vga_put_char(int x, int y, char c, unsigned char color); // вывод символа
-void vga_put_char_with_bg(int x, int y, char c, unsigned char text_color, unsigned char bg_color); // вывод символа с фоном
-void vga_print_text(int x, int y, const char *text, unsigned char color); // вывод текста
-void vga_print_text_with_bg(int x, int y, const char *text, unsigned char text_color, unsigned char bg_color); // вывод текста с фоном
-void vga_print_centered(int y, const char *text, unsigned char color); // вывод текста по центру
-void vga_print_centered_with_bg(int y, const char *text, unsigned char text_color, unsigned char bg_color); // вывод текста по центру с фоном
-void vga_scroll_up(void); // скроллинг экрана
-void vga_set_cursor(int x, int y); // установка курсора
-void vga_set_background_color(unsigned char bg_color); // установка цвета фона
-void vga_set_background_color_and_clear(unsigned char bg_color); // установка цвета фона и очистка экрана
+// функции для работы с VGA регистрами
+void vga_write_reg(uint8_t reg, uint8_t value);
+uint8_t vga_read_reg(uint8_t reg);
+// больше не используем кастомный режим 120x80
+// void vga_set_mode_120x80(void);
 
-#endif 
+// основные функции драйвера
+void vga_init(void);
+void vga_clear_screen(void);
+void vga_set_color(unsigned char color);
+unsigned char vga_get_color(void);
+void vga_put_char(int x, int y, char c, unsigned char color);
+void vga_put_char_with_bg(int x, int y, char c, unsigned char text_color, unsigned char bg_color);
+void vga_print_text(int x, int y, const char *text, unsigned char color);
+void vga_print_text_with_bg(int x, int y, const char *text, unsigned char text_color, unsigned char bg_color);
+void vga_print_centered(int y, const char *text, unsigned char color);
+void vga_print_centered_with_bg(int y, const char *text, unsigned char text_color, unsigned char bg_color);
+void vga_scroll_up(void);
+void vga_set_cursor(int x, int y);
+void vga_set_background_color(unsigned char bg_color);
+void vga_set_background_color_and_clear(unsigned char bg_color);
+void vga_enable_cursor(uint8_t cursor_start, uint8_t cursor_end);
+void vga_disable_cursor(void);
+
+#endif

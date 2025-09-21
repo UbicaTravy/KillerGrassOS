@@ -1,5 +1,5 @@
 // -----------------------------------------------
-// FecalOS VGA Driver — краткое описание и справка
+// KillerGrass OS (KGOS) VGA Driver — краткое описание и справка
 // -----------------------------------------------
 
 // Подключение:
@@ -58,27 +58,31 @@
 // Автор: KillerGrass
 
 #include "vga.h" // включаем заголовочный файл для VGA драйвера
-#include "../types.h" // собственные типы для standalone ОС
+#include "io.h" // прототипы outb/inb
+#include "../libs/types.h" // собственные типы для standalone ОС
 
 // глобальные переменные для позиции курсора
 static int cursor_x = 0; // позиция курсора по X
 static int cursor_y = 0; // позиция курсора по Y
 static unsigned char current_color = VGA_LIGHT_GREY; // текущий цвет
 
+// графические режимы отключены; работаем в текстовом режиме BIOS
+
 // инициализация VGA драйвера
 void vga_init(void) {
-    vga_clear_screen(); // очищаем экран
-    cursor_x = 0; // устанавливаем позицию курсора по X
-    cursor_y = 0; // устанавливаем позицию курсора по Y
-    current_color = VGA_LIGHT_GREY; // устанавливаем текущий цвет
+    // стандартный текстовый режим BIOS уже установлен (80x25)
+    vga_clear_screen();
+    cursor_x = 0;
+    cursor_y = 0;
+    current_color = VGA_LIGHT_GREY;
 }
 
 // очистка экрана
 void vga_clear_screen(void) {
     volatile char *vga = (volatile char*)(uintptr_t)VGA_BUFFER;
     for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT * 2; i += 2) {
-        vga[i] = ' '; // заполняем буфер пробелами
-        vga[i+1] = current_color; // устанавливаем текущий цвет
+        vga[i] = ' ';
+        vga[i+1] = current_color;
     }
     cursor_x = 0; // устанавливаем позицию курсора по X
     cursor_y = 0; // устанавливаем позицию курсора по Y
@@ -107,27 +111,34 @@ void vga_set_background_color_and_clear(unsigned char bg_color) {
 
 // вывод символа в буфер
 void vga_put_char(int x, int y, char c, unsigned char color) {
-    if (x >= 0 && x < VGA_WIDTH && y >= 0 && y < VGA_HEIGHT) {
-        volatile char *vga = (volatile char*)(uintptr_t)VGA_BUFFER;
-        int offset = y * VGA_WIDTH * 2 + x * 2;
-        vga[offset] = c;
-        vga[offset + 1] = color;
-    }
+    if (x < 0 || x >= VGA_WIDTH || y < 0 || y >= VGA_HEIGHT) return;
+    volatile char *vga = (volatile char*)(uintptr_t)VGA_BUFFER;
+    int offset = y * VGA_WIDTH * 2 + x * 2;
+    vga[offset] = c;
+    
+    // сохраняем фон из текущего цвета, используем переданный цвет для текста
+    unsigned char bg_color = (current_color & 0xF0); // получаем фон из текущего цвета
+    unsigned char text_color = (color & 0x0F); // получаем цвет текста из переданного цвета
+    vga[offset + 1] = bg_color | text_color;
 }
 
 // вывод символа с индивидуальным цветом фона
 void vga_put_char_with_bg(int x, int y, char c, unsigned char text_color, unsigned char bg_color) {
-    if (x >= 0 && x < VGA_WIDTH && y >= 0 && y < VGA_HEIGHT) {
-        volatile char *vga = (volatile char*)(uintptr_t)VGA_BUFFER;
-        int offset = y * VGA_WIDTH * 2 + x * 2;
-        vga[offset] = c;
-        
-        // Если bg_color == VGA_USE_GLOBAL_BG, используем глобальный фон
-        if (bg_color == VGA_USE_GLOBAL_BG) {
-            vga[offset + 1] = (current_color & 0xF0) | (text_color & 0x0F);
-        } else {
-            vga[offset + 1] = (bg_color << 4) | (text_color & 0x0F);
-        }
+    if (x < 0 || x >= VGA_WIDTH || y < 0 || y >= VGA_HEIGHT) return;
+    volatile char *vga = (volatile char*)(uintptr_t)VGA_BUFFER;
+    int offset = y * VGA_WIDTH * 2 + x * 2;
+    vga[offset] = c;
+    if (bg_color == VGA_USE_GLOBAL_BG) {
+        vga[offset + 1] = (current_color & 0xF0) | (text_color & 0x0F);
+    } else {
+        vga[offset + 1] = (bg_color << 4) | (text_color & 0x0F);
+    }
+}
+
+// вывод нескольких строк с индивидуальным цветом фона
+void vga_print_multiline_with_bg(int start_row, const char* lines[], int line_count, unsigned char text_color, unsigned char bg_color) {   
+    for (int i = 0; i < line_count; i++) {
+        vga_print_text_with_bg(0, start_row + i, lines[i], text_color, bg_color);
     }
 }
 
@@ -155,7 +166,6 @@ void vga_print_text(int x, int y, const char *text, unsigned char color) {
         }
     }
 }
-
 // вывод текста с индивидуальным цветом фона
 void vga_print_text_with_bg(int x, int y, const char *text, unsigned char text_color, unsigned char bg_color) {
     int pos_x = x;
@@ -204,8 +214,6 @@ void vga_print_centered_with_bg(int y, const char *text, unsigned char text_colo
 // скроллинг экрана
 void vga_scroll_up(void) {
     volatile char *vga = (volatile char*)(uintptr_t)VGA_BUFFER;
-    
-    // Копируем строки вверх
     for (int y = 0; y < VGA_HEIGHT - 1; y++) {
         for (int x = 0; x < VGA_WIDTH; x++) {
             int src_offset = (y + 1) * VGA_WIDTH * 2 + x * 2;
@@ -214,12 +222,10 @@ void vga_scroll_up(void) {
             vga[dst_offset + 1] = vga[src_offset + 1];
         }
     }
-    
-    // очищаем последнюю строку
     for (int x = 0; x < VGA_WIDTH; x++) {
         int offset = (VGA_HEIGHT - 1) * VGA_WIDTH * 2 + x * 2;
-        vga[offset] = ' '; // заполняем буфер пробелами
-        vga[offset + 1] = current_color; // устанавливаем текущий цвет
+        vga[offset] = ' ';
+        vga[offset + 1] = current_color;
     }
 }
 
@@ -229,5 +235,26 @@ void vga_set_cursor(int x, int y) {
     cursor_y = y; // устанавливаем позицию курсора по Y
     
     // просто сохраняем позицию курсора
-    // аппаратный курсор можно будет добавить позже
-} 
+}
+
+void vga_enable_cursor(uint8_t cursor_start, uint8_t cursor_end) {
+    vga_write_reg(0x0A, (vga_read_reg(0x0A) & 0xC0) | cursor_start);
+    vga_write_reg(0x0B, (vga_read_reg(0x0B) & 0xE0) | cursor_end);
+}
+
+void vga_disable_cursor(void) {
+    vga_write_reg(0x0A, 0x20);
+}
+
+// реализации функций для работы с VGA регистрами
+void vga_write_reg(uint8_t reg, uint8_t value) {
+    outb(0x3D4, reg);
+    outb(0x3D5, value);
+}
+
+uint8_t vga_read_reg(uint8_t reg) {
+    outb(0x3D4, reg);
+    return inb(0x3D5);
+}
+
+// кастомный режим отключен

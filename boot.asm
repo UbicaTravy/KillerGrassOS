@@ -1,54 +1,62 @@
+; bootloader KillerGrass OS
+
 [org 0x7C00]
 [bits 16]
 
+%ifndef KERNEL_SECTORS
+%define KERNEL_SECTORS 40 ; fallback if not provided by build system
+%endif
+
 start:
-    ; Инициализируем сегментные регистры
+    ; инициализируем сегментные регистры
     cli
-    mov ax, 0
+    xor ax, ax ; Я НИКОГДА НЕ НАПИШУ mov ax, 0!
     mov ds, ax
     mov es, ax
     mov ss, ax
     mov sp, 0x7C00
 
-    ; Сохраняем номер диска
+    ; сохраняем номер диска
     mov [boot_drive], dl
 
-    ; Выводим сообщение о загрузке
+    ; сообщение о загрузке
     mov si, loading_msg
     call print_string
 
-    ; Читаем ядро с диска (только 5 секторов для начала)
-    mov ah, 0x02        ; Функция чтения диска
-    mov al, 5           ; Количество секторов (2.5KB)
-    mov ch, 0           ; Цилиндр 0
-    mov cl, 2           ; Сектор 2
-    mov dh, 0           ; Головка 0
-    mov dl, [boot_drive] ; Номер диска
-    mov bx, 0x8000      ; Адрес загрузки
+    ; оставляем стандартный текстовый режим 80x25
+
+    ; читаем ядро с диска
+    mov ah, 0x02        ; функция чтения диска
+    mov al, KERNEL_SECTORS ; количество секторов ядра
+    mov ch, 0           ; цилиндр 0
+    mov cl, 2           ; сектор 2
+    mov dh, 0           ; головка 0
+    mov dl, [boot_drive] ; номер диска
+    mov bx, 0x8000      ; адрес загрузки
     int 0x13
     jc disk_error
 
-    ; Выводим сообщение об успешном чтении
+    ; выводим сообщение об успешном чтении
     mov si, disk_ok_msg
     call print_string
 
-    ; Простой переход в защищенный режим (без Long Mode для начала)
+    ; простой переход в защищенный режим
     cli
     
-    ; Загружаем GDT
+    ; загружаем GDT
     lgdt [gdt_descriptor]
     
-    ; Включаем A20
+    ; включаем A20
     in al, 0x92
     or al, 2
     out 0x92, al
     
-    ; Включаем защищенный режим
+    ; включаем защищенный режим
     mov eax, cr0
     or eax, 1
     mov cr0, eax
     
-    ; Длинный переход в защищенный режим
+    ; длинный переход в защищенный режим
     jmp 0x08:protected_mode
 
 disk_error:
@@ -66,31 +74,34 @@ print_string:
 .done:
     ret
 
+; 32 битный режим
 [bits 32]
 protected_mode:
-    ; Устанавливаем сегментные регистры
+    ; инициализируем сегментные регистры
     mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    
-    ; Устанавливаем стек
     mov esp, 0x90000
     
-    ; Копируем ядро в правильное место
+    ; копируем ядро в правильное место (1MB)
     mov esi, 0x8000
     mov edi, 0x100000
-    mov ecx, 0x1400    ; 5KB
+%define KERNEL_BYTES (KERNEL_SECTORS * 512)
+    mov ecx, KERNEL_BYTES
     rep movsb
     
-    ; Переход к ядру
-    jmp 0x100000
+    ; переход к ядру
+    call 0x100000
+    
+    ; если ядро вернется (не должно), то зависаем
+    jmp $
 
-; Данные
+; данные
 boot_drive db 0
-loading_msg db 'Loading FecalOS (Simple)...', 13, 10, 0
+loading_msg db 'Loading KillerGrass OS (KGOS)...', 13, 10, 0
 disk_ok_msg db 'Disk OK!', 13, 10, 0
 disk_error_msg db 'Disk error!', 13, 10, 0
 
@@ -105,5 +116,5 @@ gdt_descriptor:
     dw gdt_end - gdt_start - 1
     dd gdt_start
 
-times 510-($-$$) db 0
+times 510-($-$$) db 0 ; остальное заполняем нулями. до 510 потому что 2 байта уходят на магическое число в конце
 dw 0xAA55 

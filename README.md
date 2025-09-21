@@ -1,4 +1,4 @@
-# KillerGrass OS (KGOS)
+KillerGrass OS (KGOS)
 
 > **KillerGrass OS (KGOS)** is a simple 32-bit operating system with a modular kernel, VGA driver, basic command shell, and demo user code. See below for Russian description and details.
 
@@ -9,18 +9,14 @@
 [![QEMU x86](https://img.shields.io/badge/QEMU-x86-FF6600?style=flat)]()
 
 <div align="center">
-<img src="img/killergrass_os_logo.jpg" width="500" alt="KillerGrassOS_logo"/>
+<img src="img/killergrass_logo.jpg" width="500" alt="KGOS_logo"/>
 </div>
 
-**KillerGrass OS (KGOS)** — простая 32-битная операционная система с модульным ядром, VGA-драйвером, базовой командной оболочкой и демонстрационным пользовательским кодом.
+**KillerGrass OS (KGOS)** — простая 32-битная операционная система с модульным ядром, VGA-драйвером, базовой командной оболочкой и выполнением встроенных команд.
 
-**!Внимание!**
+Последняя версия: v0.0003
 
-Ранее проект назывался FecalOS - в коде оно встречается. Сочтите за пасхалку)
-
-Последняя версия: v0.0002
-
-[Биография проекта](BIO-FECALOS.md)
+[Биография и документация проекта](BIO-FECALOS.md)
 
 ---
 
@@ -31,27 +27,33 @@
 ```bash
 sudo apt install gcc nasm binutils grub-pc-bin xorriso qemu-system-x86
 make clean && make
-qemu-system-x86_64 -drive format=raw,file=os.img -serial stdio -no-reboot -no-shutdown
+qemu-system-x86_64 -cdrom os.img -serial stdio
 ```
 
 ---
 
-## 📁 Структура проекта
+## 📁 Структура проекта (тут не всё, но самое главное)
 
 ```
-KGOS/
-├── drivers/           # Драйверы устройств (VGA, клавиатура)
+KillerGrassOS/
+├── drivers/           # драйверы устройств (VGA, клавиатура)
 │   ├── vga.c/h
 │   ├── keyboard.c/h
-├── kernel.c           # Ядро: инициализация, проверки, запуск fecalos_main
-├── fecalos.c          # Пользовательская/демонстрационная логика ОС
-├── fecalos.h          # Прототип fecalos_main
-├── string.c/h         # Строковые функции
-├── types.h            # Собственные типы (size_t, uint32_t и др.)
-├── boot.asm           # Загрузчик
-├── multiboot_header.asm # Multiboot2 заголовок
-├── linker.ld          # Скрипт линковки
-└── Makefile           # Система сборки
+|   ├── fash.c         # командная оболочка
+├── kernel/
+|   ├── commands/      # команды
+|   ├── programms      # программы
+|   ├── logo.c         # логотип
+|   ├── logo.h
+├── libs/              # бибилиотеки строк и типов
+├── kernel.c           # ядро: инициализация, проверки, запуск fecalos_main
+├── fecalos.c          # пользовательская/демонстрационная логика ОС
+├── fecalos.h          # прототип fecalos_main
+├── string.c/h         # строковые функции
+├── types.h            # собственные типы (size_t, uint32_t и др.)
+├── boot.asm           # загрузчик
+├── linker.ld          # скрипт линковки
+└── Makefile           # система сборки
 ```
 
 ## Сборка
@@ -61,36 +63,24 @@ KGOS/
 - gcc (32-битная поддержка)
 - nasm
 - ld, objcopy (binutils)
-- grub-mkrescue, xorriso (для ISO)
 - qemu-system-x86 (для теста)
 
 ### Основные команды
 
 ```bash
-make clean         # Очистить сборку
-make               # Собрать образ os.img (флоппи)
-make run           # Запустить os.img в QEMU
+make clean         # очистить сборку
+make               # собрать образ os.img (флоппи)
+make iso           # собрать загрузочный ISO-образ
+make run           # запустить os.img в QEMU
 ```
 
 ---
 
 ## Запуск
 
-- **Флоппи-образ:**
   ```bash
   make run
   ```
-
----
-
-## Архитектура
-
-- **kernel.c** — инициализация драйверов, проверки, запуск fecalos_main
-- **fecalos.c** — пользовательская логика, приветствие, демонстрация возможностей
-- **drivers/** — VGA, клавиатура (PS/2)
-- **commands/** — help, info, clear, echo, version
-- **shell.c/h** — простая командная строка
-- **types.h** — собственные типы для freestanding-сборки
 
 ---
 
@@ -98,10 +88,10 @@ make run           # Запустить os.img в QEMU
 
 - VGA текстовый режим (16 цветов, индивидуальный фон для каждой строки)
 - PS/2 клавиатура (обработка ввода)
-- Командная строка (CLI)
-- Базовые команды (help, info, clear, echo, version)
-- Модульная архитектура (ядро ≠ пользовательская логика)
-- Сборка ISO и запуск в QEMU
+- Командная строка fash (CLI)
+- Базовые команды (help, info, clear, echo, version, ...)
+- Модульная архитектура (ядро ≠ пользовательская логика, можно легко добавлять свои драйвера, модули и команды)
+- Разделение на команды и программы
 
 ---
 
@@ -117,13 +107,18 @@ Pull requests, issues, and suggestions are welcome! Feel free to fork the projec
 
 ---
 
+## Our in Telegram
+
+[![Telegram](https://img.shields.io/badge/-Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/killergass_os)
+
+---
+
 ### Created by KillerGrass
 
 <div align="center">
 <img src="img/killergrass_logo.jpg" width="400" alt="KillerGrass_logo"/>
 
 [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/UbicaTravy)
-[![Telegram](https://img.shields.io/badge/-Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/killergrass_programms)
 [![LIVE Channel](https://img.shields.io/badge/-LIVE%20Kanal-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/kanal_kashkamalhika)
 </div>
 

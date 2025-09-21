@@ -1,5 +1,5 @@
 // -----------------------------------------------
-// FecalOS Kernel — краткое описание и справка
+// KillerGrass OS (KGOS) Kernel — краткое описание и справка
 // -----------------------------------------------
 
 // Скорре всего ты зашёл сюда в первую очередь чтобы посмотреть на мой код.
@@ -27,21 +27,43 @@
 // Потом ядро принимает результат и отдаёт ОС, а ОС отдаёт пользователю.
 // Вот такие пироги.
 
-// FecalOS Kernel
+// KillerGrass OS (KGOS) Kernel
 // Author: KillerGrass
 
 #include "drivers/vga.h"
-#include "types.h"
-#include "fecalos.h"
+#include "libs/types.h"
+#include "kgos.h"
 
 void main() {
-    // Проверка и инициализация VGA драйвера (VGA driver init)
+    // простая проверка - выводим символы напрямую в VGA буфер
+    volatile char* vga = (volatile char*)0xB8000;
+    vga[0] = 'K';
+    vga[1] = 0x0F; // белый цвет
+    vga[2] = 'E';
+    vga[3] = 0x0F;
+    vga[4] = 'R';
+    vga[5] = 0x0F;
+    vga[6] = 'N';
+    vga[7] = 0x0F;
+    vga[8] = 'E';
+    vga[9] = 0x0F;
+    vga[10] = 'L';
+    vga[11] = 0x0F;
+    
+    // проверка и инициализация VGA драйвера (VGA driver init)
     vga_init();
-    vga_set_background_color_and_clear(VGA_BLACK);
-    vga_print_centered(2, "FecalOS Kernel Boot", VGA_LIGHT_GREEN);
+    
+    // устанавливаем синий фон сразу
+    vga_set_background_color_and_clear(VGA_BLUE);
+    vga_set_cursor(10, 10);
+    
+    // отладочная инфа
+    vga_print_centered(1, "KillerGrass OS (KGOS) Kernel Boot", VGA_LIGHT_GREEN);
+    vga_print_centered(2, "VGA initialized successfully", VGA_WHITE);
+    vga_print_centered(3, "Starting KGOS main...", VGA_LIGHT_CYAN);
 
-
-    fecalos_main();
+    // запускаем ОС
+    kgos_main();
 }
 
 void _start() {
