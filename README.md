@@ -9,7 +9,7 @@ KillerGrass OS (KGOS)
 [![QEMU x86](https://img.shields.io/badge/QEMU-x86-FF6600?style=flat)]()
 
 <div align="center">
-<img src="img/killergrass_logo.jpg" width="500" alt="KGOS_logo"/>
+<img src="img/killergrass_os_logo.jpg" width="500" alt="KGOS_logo"/>
 </div>
 
 **KillerGrass OS (KGOS)** — простая 32-битная операционная система с модульным ядром, VGA-драйвером, базовой командной оболочкой и выполнением встроенных команд.
