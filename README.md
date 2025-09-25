@@ -4,8 +4,9 @@ KillerGrass OS (KGOS)
 
 ---
 
-![ASM](https://img.shields.io/badge/Assembler-16_bit-007AAC?style=flat&logo=assemblyscript&logoColor=white)
+![ASM](https://img.shields.io/badge/Assembler-32_bit-007AAC?style=flat&logo=assemblyscript&logoColor=white)
 ![NASM](https://img.shields.io/badge/Assembler-NASM-007AAC?style=flat&logo=assemblyscript&logoColor=white)
+![C](https://img.shields.io/badge/C-A8B9CC?style=for-the-badge&logo=c&logoColor=white)
 [![QEMU x86](https://img.shields.io/badge/QEMU-x86-FF6600?style=flat)]()
 
 <div align="center">
